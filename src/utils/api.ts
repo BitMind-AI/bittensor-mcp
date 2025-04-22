@@ -10,26 +10,26 @@
  * @returns Response data from the API
  */
 export async function callBittensorAPI(url: string, body: any, token: string) {
-  console.log(`Calling Bittensor API: ${url}`);
-  
+  console.log(`Calling Bittensor API: ${url}`)
+
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify(body)
-  });
+    body: JSON.stringify(body),
+  })
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Bittensor API error: ${response.status} - ${errorText}`);
+    const errorText = await response.text()
+    throw new Error(`Bittensor API error: ${response.status} - ${errorText}`)
   }
 
-  const result = await response.json();
-  console.log("API call successful");
-  
-  return result;
+  const result = await response.json()
+  console.log('API call successful')
+
+  return result
 }
 
 /**
@@ -38,16 +38,19 @@ export async function callBittensorAPI(url: string, body: any, token: string) {
  * @param requiredParams - List of required parameter names
  * @returns Error message or null if valid
  */
-export function validateParams(params: any, requiredParams: string[]): string | null {
+export function validateParams(
+  params: any,
+  requiredParams: string[]
+): string | null {
   if (!params) {
-    return "No parameters provided";
+    return 'No parameters provided'
   }
-  
+
   for (const param of requiredParams) {
     if (params[param] === undefined || params[param] === null) {
-      return `Missing required parameter: ${param}`;
+      return `Missing required parameter: ${param}`
     }
   }
-  
-  return null;
+
+  return null
 }

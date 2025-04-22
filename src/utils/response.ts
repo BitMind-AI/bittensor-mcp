@@ -4,11 +4,11 @@
 
 // Types for MCP content items
 export type TextContent = {
-  type: "text";
-  text: string;
-};
+  type: 'text'
+  text: string
+}
 
-export type McpContent = TextContent;
+export type McpContent = TextContent
 
 /**
  * Create a standard MCP response with proper formatting
@@ -20,14 +20,14 @@ export function createMcpResponse(content: McpContent[], isError = false) {
   return new Response(
     JSON.stringify({
       response: {
-        status: isError ? "error" : "success",
-        content
-      }
+        status: isError ? 'error' : 'success',
+        content,
+      },
     }),
     {
-      headers: { "Content-Type": "application/json" }
+      headers: { 'Content-Type': 'application/json' },
     }
-  );
+  )
 }
 
 /**
@@ -40,19 +40,19 @@ export function createErrorResponse(message: string, status = 400) {
   return new Response(
     JSON.stringify({
       response: {
-        status: "error",
+        status: 'error',
         error: message,
         content: [
           {
-            type: "text",
-            text: message
-          }
-        ]
-      }
+            type: 'text',
+            text: message,
+          },
+        ],
+      },
     }),
     {
       status,
-      headers: { "Content-Type": "application/json" }
+      headers: { 'Content-Type': 'application/json' },
     }
-  );
+  )
 }
