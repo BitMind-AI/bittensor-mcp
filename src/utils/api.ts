@@ -26,9 +26,27 @@ export async function callBittensorAPI(url: string, body: any, token: string) {
     throw new Error(`Bittensor API error: ${response.status} - ${errorText}`);
   }
 
-  const result = await response.json();
-  console.log("API call successful");
+  const responseText = await response.text();
+  let result;
   
+  try {
+    // Try parsing as regular JSON first
+    result = JSON.parse(responseText);
+  } catch (e) {
+    // If that fails, check if it's a data: prefixed response
+    if (responseText.startsWith('data:')) {
+      try {
+        // Remove the data: prefix and parse the rest as JSON
+        result = JSON.parse(responseText.substring(5));
+      } catch (e2) {
+        throw new Error(`Failed to parse API response: ${responseText}`);
+      }
+    } else {
+      throw new Error(`Failed to parse API response: ${responseText}`);
+    }
+  }
+
+  console.log("API call successful");
   return result;
 }
 

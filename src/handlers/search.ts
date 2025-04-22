@@ -19,10 +19,12 @@ export async function searchHandler(c: Context<{ Bindings: Env }>, parameters: a
 
     const { 
       prompt,
-      tools = ["Google Search"],
+      tools = ["web", "reddit", "hackernews", "arxiv"],
       model = "NOVA",
-      response_order = "LINKS_FIRST",
-      date_filter = "PAST_WEEK"
+      date_filter = "PAST_MONTH",
+      streaming = true,
+      result_type = "LINKS_WITH_FINAL_SUMMARY",
+      system_message = "Focus on technical details and recent developments."
     } = parameters;
 
     const apiToken = c.env.BITTENSOR_API_TOKEN;
@@ -40,8 +42,10 @@ export async function searchHandler(c: Context<{ Bindings: Env }>, parameters: a
         prompt,
         tools,
         model,
-        response_order,
-        date_filter
+        date_filter,
+        streaming,
+        result_type,
+        system_message
       },
       apiToken
     );

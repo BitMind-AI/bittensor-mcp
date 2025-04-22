@@ -5,26 +5,25 @@ import { BITTENSOR_ENDPOINTS, ERROR_MESSAGES } from "../constants";
 import { createMcpResponse } from "../utils/response";
 
 /**
- * Handler for Vision chat requests
+ * Handler for Cortext completions requests
  */
-export async function visionChatHandler(c: Context<{ Bindings: Env }>, parameters: any) {
+export async function cortextCompletionsHandler(c: Context<{ Bindings: Env }>, parameters: any) {
   try {
     // Validate parameters
-    if (!parameters || !parameters.messages || !Array.isArray(parameters.messages)) {
+    if (!parameters || !parameters.prompt) {
       return c.json({ 
         error: ERROR_MESSAGES.MISSING_PARAMETERS,
-        message: "Missing required parameter: messages (array)"
+        message: "Missing required parameter: prompt"
       }, 400);
     }
 
     const { 
-      messages,
-      model = "llama-3",
-      temperature = 0.1,
-      max_tokens = 100,
-      top_p = 1,
-      stream = false,
-      logprobs = false
+      prompt,
+      model = "unsloth/Llama-3.2-3B-Instruct",
+      temperature = 0.5,
+      max_tokens = 50,
+      top_p = 0.5,
+      stream = false
     } = parameters;
 
     const apiToken = c.env.BITTENSOR_API_TOKEN;
@@ -37,15 +36,14 @@ export async function visionChatHandler(c: Context<{ Bindings: Env }>, parameter
     
     // Call the Bittensor API
     const result = await callBittensorAPI(
-      BITTENSOR_ENDPOINTS.VISION_CHAT,
+      BITTENSOR_ENDPOINTS.CORTEXT_COMPLETIONS,
       { 
-        messages,
+        prompt,
         model,
         temperature,
         max_tokens,
         top_p,
-        stream,
-        logprobs
+        stream
       },
       apiToken
     );
@@ -54,7 +52,7 @@ export async function visionChatHandler(c: Context<{ Bindings: Env }>, parameter
     return createMcpResponse([
       {
         type: "text",
-        text: "Vision chat results:"
+        text: "Cortext completions results:"
       },
       {
         type: "text",
@@ -62,10 +60,10 @@ export async function visionChatHandler(c: Context<{ Bindings: Env }>, parameter
       }
     ]);
   } catch (error) {
-    console.error("Vision chat error:", error);
+    console.error("Cortext completions error:", error);
     return c.json({ 
       error: ERROR_MESSAGES.API_ERROR,
-      message: error instanceof Error ? error.message : "Unknown error processing Vision chat request"
+      message: error instanceof Error ? error.message : "Unknown error processing Cortext completions request"
     }, 500);
   }
 } 

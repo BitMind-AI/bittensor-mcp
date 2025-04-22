@@ -5,25 +5,26 @@ import { BITTENSOR_ENDPOINTS, ERROR_MESSAGES } from "../constants";
 import { createMcpResponse } from "../utils/response";
 
 /**
- * Handler for Vision text-to-image requests
+ * Handler for text-to-image requests
  */
 export async function visionTextToImageHandler(c: Context<{ Bindings: Env }>, parameters: any) {
   try {
     // Validate parameters
-    if (!parameters || !parameters.text_prompts || !Array.isArray(parameters.text_prompts)) {
+    if (!parameters || !parameters.prompt) {
       return c.json({ 
         error: ERROR_MESSAGES.MISSING_PARAMETERS,
-        message: "Missing required parameter: text_prompts (array)"
+        message: "Missing required parameter: prompt"
       }, 400);
     }
 
     const { 
-      text_prompts,
-      cfg_scale = 2,
+      prompt,
+      model = "dataautogpt3/ProteusV0.4-Lightning",
+      steps = 8,
+      cfg_scale = 3,
       height = 1024,
       width = 1024,
-      steps = 8,
-      engine = "proteus"
+      negative_prompt = ""
     } = parameters;
 
     const apiToken = c.env.BITTENSOR_API_TOKEN;
@@ -36,14 +37,15 @@ export async function visionTextToImageHandler(c: Context<{ Bindings: Env }>, pa
     
     // Call the Bittensor API
     const result = await callBittensorAPI(
-      BITTENSOR_ENDPOINTS.VISION_TEXT_TO_IMAGE,
+      BITTENSOR_ENDPOINTS.TEXT_TO_IMAGE,
       { 
-        text_prompts,
+        prompt,
+        model,
+        steps,
         cfg_scale,
         height,
         width,
-        steps,
-        engine
+        negative_prompt
       },
       apiToken
     );
@@ -52,7 +54,7 @@ export async function visionTextToImageHandler(c: Context<{ Bindings: Env }>, pa
     return createMcpResponse([
       {
         type: "text",
-        text: "Vision text-to-image results:"
+        text: "Text-to-image results:"
       },
       {
         type: "text",
@@ -60,10 +62,10 @@ export async function visionTextToImageHandler(c: Context<{ Bindings: Env }>, pa
       }
     ]);
   } catch (error) {
-    console.error("Vision text-to-image error:", error);
+    console.error("Text-to-image error:", error);
     return c.json({ 
       error: ERROR_MESSAGES.API_ERROR,
-      message: error instanceof Error ? error.message : "Unknown error processing Vision text-to-image request"
+      message: error instanceof Error ? error.message : "Unknown error processing text-to-image request"
     }, 500);
   }
 } 

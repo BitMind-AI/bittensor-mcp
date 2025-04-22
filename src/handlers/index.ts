@@ -5,10 +5,10 @@ import { textAnalysisHandler } from "./text-analysis";
 import { chatHandler } from "./chat";
 import { qnaHandler } from "./qna";
 import { cortextChatHandler } from "./cortext-chat";
-import { cortextTextToImageHandler } from "./cortext-text-to-image";
-import { visionChatHandler } from "./vision-chat";
+import { cortextCompletionsHandler } from "./cortext-completions";
 import { visionTextToImageHandler } from "./vision-text-to-image";
 import { searchHandler } from "./search";
+import { imageToImageHandler } from './image-to-image';
 import { ERROR_MESSAGES } from "../constants";
 
 /**
@@ -43,17 +43,17 @@ export async function handleMcpRequest(c: Context<{ Bindings: Env }>) {
       case 'cortext-chat':
         return await cortextChatHandler(c, parameters);
       
-      case 'cortext-text-to-image':
-        return await cortextTextToImageHandler(c, parameters);
+      case 'cortext-completions':
+        return await cortextCompletionsHandler(c, parameters);
       
-      case 'vision-chat':
-        return await visionChatHandler(c, parameters);
-      
-      case 'vision-text-to-image':
+      case 'text-to-image':
         return await visionTextToImageHandler(c, parameters);
       
       case 'search':
         return await searchHandler(c, parameters);
+      
+      case 'image-to-image':
+        return imageToImageHandler(c, parameters);
       
       default:
         return c.json({ 

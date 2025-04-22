@@ -77,18 +77,18 @@ test_endpoint "cortext-chat" '{
     "request": {
         "function": "cortext-chat",
         "parameters": {
-  "messages": [
-    {
-      "role": "user",
-      "content": "What is the capital of France?"
-    }
-  ],
-  "model": "unsloth/Llama-3.2-3B-Instruct",
-  "temperature": 0.5,
-  "max_tokens": 500,
-  "top_p": 0.5,
-  "stream": false
-}
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "What is the capital of France?"
+                }
+            ],
+            "model": "unsloth/Llama-3.2-3B-Instruct",
+            "temperature": 0.5,
+            "max_tokens": 500,
+            "top_p": 0.5,
+            "stream": false
+        }
     }
 }'
 
@@ -146,59 +146,36 @@ test_endpoint "search" '{
     }
 }'
 
-# Test cortext-text-to-image endpoint
-test_endpoint "cortext-text-to-image" '{
+# Test text-to-image endpoint
+test_endpoint "text-to-image" '{
     "request": {
-        "function": "cortext-text-to-image",
+        "function": "text-to-image",
         "parameters": {
-            "prompt": "A beautiful sunset over mountains",
-            "model": "cortext-image",
-            "style": "vivid",
-            "size": "1024x1024",
-            "quality": "hd",
-            "steps": 30,
-            "cfg_scale": 8,
-            "seed": 0
-        }
-    }
-}'
-
-# Test vision-chat endpoint
-test_endpoint "vision-chat" '{
-    "request": {
-        "function": "vision-chat",
-        "parameters": {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "Hello, how are you?"
-                }
-            ],
-            "model": "llama-3",
-            "temperature": 0.1,
-            "max_tokens": 100,
-            "top_p": 1,
-            "stream": false,
-            "logprobs": false
-        }
-    }
-}'
-
-# Test vision-text-to-image endpoint
-test_endpoint "vision-text-to-image" '{
-    "request": {
-        "function": "vision-text-to-image",
-        "parameters": {
-            "text_prompts": [
-                {
-                    "text": "4 hedgehogs, wearing tuxedos, riding on the back of a crocodile."
-                }
-            ],
-            "cfg_scale": 2,
+            "prompt": "A fluffy cat",
+            "model": "dataautogpt3/ProteusV0.4-Lightning",
+            "steps": 8,
+            "cfg_scale": 3,
             "height": 1024,
             "width": 1024,
-            "steps": 8,
-            "engine": "proteus"
+            "negative_prompt": ""
+        }
+    }
+}'
+
+# Test image-to-image endpoint
+test_endpoint "image-to-image" '{
+    "request": {
+        "function": "image-to-image",
+        "parameters": {
+            "prompt": "Make his hat blue",
+            "model": "dataautogpt3/ProteusV0.4-Lightning",
+            "steps": 10,
+            "cfg_scale": 3,
+            "height": 1024,
+            "width": 1024,
+            "negative_prompt": "",
+            "image_strength": 0.5,
+            "init_image": "https://lastfm.freetls.fastly.net/i/u/770x0/443c5e1c35fd38bb5a49a7d00612dab3.jpg#443c5e1c35fd38bb5a49a7d00612dab3"
         }
     }
 }'
@@ -218,7 +195,22 @@ test_endpoint "analyze-text" '{
     "request": {
         "function": "analyze-text",
         "parameters": {
-            "text": "This is a sample text to analyze. This is a sample text to analyze."
+            "text": "This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze. This is a sample text to analyze."
+        }
+    }
+}'
+
+# Test cortext completions endpoint
+test_endpoint "cortext-completions" '{
+    "request": {
+        "function": "cortext-completions",
+        "parameters": {
+            "prompt": "The most loved programming language is",
+            "model": "unsloth/Llama-3.2-3B-Instruct",
+            "temperature": 0.5,
+            "max_tokens": 50,
+            "top_p": 0.5,
+            "stream": false
         }
     }
 }'

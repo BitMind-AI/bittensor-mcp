@@ -13,9 +13,9 @@ export const BITTENSOR_ENDPOINTS = {
   CHAT: `${BITTENSOR_BASE_URL}/1/chat`,
   QNA: `${BITTENSOR_BASE_URL}/20/chat`,
   CORTEXT_CHAT: `${BITTENSOR_BASE_URL}/19/chat/completions`,
-  CORTEXT_TEXT_TO_IMAGE: `${BITTENSOR_BASE_URL}/19/text-to-image`,
-  VISION_CHAT: `${BITTENSOR_BASE_URL}/19/image-to-image`,
-  VISION_TEXT_TO_IMAGE: `${BITTENSOR_BASE_URL}/19/text-to-image`,
+  CORTEXT_COMPLETIONS: `${BITTENSOR_BASE_URL}/19/completions`,
+  IMAGE_TO_IMAGE: `${BITTENSOR_BASE_URL}/19/image-to-image`,
+  TEXT_TO_IMAGE: `${BITTENSOR_BASE_URL}/19/text-to-image`,
   SEARCH: `${BITTENSOR_BASE_URL}/22/search`,
 };
 
