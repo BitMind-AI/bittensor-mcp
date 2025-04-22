@@ -1,0 +1,11 @@
+name = "bittensor-mcp-server"
+main = "./dist/index.js"
+compatibility_date = "2023-10-16"
+
+# Configure for TypeScript
+[build]
+command = "npm run build"
+
+# Configure dev environment
+[dev]
+port = 8787

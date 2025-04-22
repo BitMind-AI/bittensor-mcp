@@ -1,0 +1,22 @@
+{
+  "name": "bittensor-mcp-server",
+  "version": "1.0.0",
+  "description": "Cloudflare MCP Server with Bittensor Oracle API Integration",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "wrangler dev",
+    "deploy": "tsc && wrangler deploy"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "hono": "^3.11.11",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240320.1",
+    "@types/node": "^20.11.27",
+    "typescript": "^5.4.2",
+    "wrangler": "^3.32.0"
+  }
+}
