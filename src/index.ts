@@ -12,22 +12,13 @@ export interface Env {
   [key: string]: any
 }
 
-export class MyMCP extends McpAgent {
+export class BittensorMCP extends McpAgent {
   server = new McpServer({
     name: SERVER_CONFIG.NAME,
     version: SERVER_CONFIG.VERSION,
   })
 
   async init() {
-    // Simple add tool (example)
-    this.server.tool(
-      'add',
-      { a: z.number(), b: z.number() },
-      async ({ a, b }) => ({
-        content: [{ type: 'text', text: String(a + b) }],
-      })
-    )
-
     // Image detection tool
     this.server.tool(
       'detect-image',
@@ -136,7 +127,7 @@ export default new OAuthProvider({
   apiRoute: '/sse',
   // TODO: fix these types
   // @ts-ignore
-  apiHandler: MyMCP.mount('/sse'),
+  apiHandler: BittensorMCP.mount('/sse'),
   // @ts-ignore
   defaultHandler: app,
   authorizeEndpoint: '/authorize',

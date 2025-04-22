@@ -1,117 +1,121 @@
-# Remote MCP Server on Cloudflare
+# Bittensor MCP Server
 
-Let's get a remote MCP server up-and-running on Cloudflare Workers complete with OAuth login!
+A Cloudflare Worker that provides access to Bittensor's intelligence oracles through the Model Context Protocol (MCP).
 
-## Develop locally
+## Overview
+
+This server acts as a bridge between MCP-compatible clients (like Claude, GPT-4, etc.) and Bittensor's neural networks. It allows AI assistants to access Bittensor's capabilities through a standardized interface.
+
+## Features
+
+- **Image Detection**: Analyze images using Bittensor's neural network
+- **Text Analysis**: Process and analyze text using Bittensor's language models
+- **OAuth Authentication**: Secure access to the MCP server
+- **SSE Support**: Compatible with MCP Inspector for testing and debugging
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or later)
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/) (Cloudflare Workers CLI)
+- A Cloudflare account
+- A Bittensor API token
+
+## Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/bittensor-mcp-server.git
+   cd bittensor-mcp-server
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.dev.vars` file for local development (copy from example):
+   ```bash
+   cp .dev.vars.example .dev.vars
+   ```
+
+4. Edit the `.dev.vars` file and add your Bittensor API token:
+   ```
+   BITTENSOR_API_TOKEN=your_api_token_here
+   ```
+
+5. Create a KV namespace for OAuth:
+   ```bash
+   wrangler kv:namespace create OAUTH_KV
+   ```
+
+6. Update the `wrangler.jsonc` file with your KV namespace ID.
+
+## Development
+
+Start the development server:
 
 ```bash
-# clone the repository
-git clone git@github.com:cloudflare/ai.git
-
-# install dependencies
-cd ai
-npm install
-
-# run locally
-npx nx dev remote-mcp-server
+npm start
 ```
 
-You should be able to open [`http://localhost:8787/`](http://localhost:8787/) in your browser
+This will start a local server at http://localhost:8787.
 
-## Connect the MCP inspector to your server
+## Testing with MCP Inspector
 
-To explore your new MCP api, you can use the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
+You can use the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) to test the server:
 
-- Start it with `npx @modelcontextprotocol/inspector`
-- [Within the inspector](http://localhost:5173), switch the Transport Type to `SSE` and enter `http://localhost:8787/sse` as the URL of the MCP server to connect to, and click "Connect"
-- You will navigate to a (mock) user/password login screen. Input any email and pass to login.
-- You should be redirected back to the MCP Inspector and you can now list and call any defined tools!
+1. Install the MCP Inspector:
+   ```bash
+   npm install -g @modelcontextprotocol/inspector
+   ```
 
-<div align="center">
-  <img src="img/mcp-inspector-sse-config.png" alt="MCP Inspector with the above config" width="600"/>
-</div>
+2. Run the MCP Inspector:
+   ```bash
+   mcp-inspector
+   ```
 
-<div align="center">
-  <img src="img/mcp-inspector-successful-tool-call.png" alt="MCP Inspector with after a tool call" width="600"/>
-</div>
+3. Connect to your server using the SSE transport type with URL: `http://localhost:8787/sse`
 
-## Connect Claude Desktop to your local MCP server
+## Deployment
 
-The MCP inspector is great, but we really want to connect this to Claude! Follow [Anthropic's Quickstart](https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config to find your configuration file.
+Deploy to Cloudflare Workers:
 
-Open the file in your text editor and replace it with this configuration:
+```bash
+npm run deploy
+```
 
-```json
-{
-  "mcpServers": {
-    "math": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:8787/sse"
-      ]
+## API Usage
+
+### Image Detection
+
+```bash
+curl -X POST "https://your-worker.workers.dev/v1/mcp" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request": {
+      "function": "detect-image",
+      "parameters": {
+        "image": "https://example.com/image.jpg"
+      }
     }
-  }
-}
+  }'
 ```
 
-This will run a local proxy and let Claude talk to your MCP server over HTTP
+### Text Analysis
 
-When you open Claude a browser window should open and allow you to login. You should see the tools available in the bottom right. Given the right prompt Claude should ask to call the tool.
-
-<div align="center">
-  <img src="img/available-tools.png" alt="Clicking on the hammer icon shows a list of available tools" width="600"/>
-</div>
-
-<div align="center">
-  <img src="img/claude-does-math-the-fancy-way.png" alt="Claude answers the prompt 'I seem to have lost my calculator and have run out of fingers. Could you use the math tool to add 23 and 19?' by invoking the MCP add tool" width="600"/>
-</div>
-
-## Deploy to Cloudflare
-
-1. `npx wrangler kv namespace create OAUTH_KV`
-2. Follow the guidance to add the kv namespace ID to `wrangler.jsonc`
-3. `npm run deploy`
-
-## Call your newly deployed remote MCP server from a remote MCP client
-
-Just like you did above in "Develop locally", run the MCP inspector:
-
-`npx @modelcontextprotocol/inspector@latest`
-
-Then enter the `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) of your Worker in the inspector as the URL of the MCP server to connect to, and click "Connect".
-
-You've now connected to your MCP server from a remote MCP client.
-
-## Connect Claude Desktop to your remote MCP server
-
-Update the Claude configuration file to point to your `workers.dev` URL (ex: `worker-name.account-name.workers.dev/sse`) and restart Claude 
-
-```json
-{
-  "mcpServers": {
-    "math": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "https://worker-name.account-name.workers.dev/sse"
-      ]
+```bash
+curl -X POST "https://your-worker.workers.dev/v1/mcp" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request": {
+      "function": "analyze-text",
+      "parameters": {
+        "text": "Your text to analyze"
+      }
     }
-  }
-}
+  }'
 ```
 
-## Debugging
+## License
 
-Should anything go wrong it can be helpful to restart Claude, or to try connecting directly to your
-MCP server on the command line with the following command.
-
-```bash
-npx mcp-remote http://localhost:8787/sse
-```
-
-In some rare cases it may help to clear the files added to `~/.mcp-auth`
-
-```bash
-rm -rf ~/.mcp-auth
-```
+MIT

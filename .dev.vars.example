@@ -1,1 +1,2 @@
-BITTENSOR_API_TOKEN=X
+# Bittensor API token for authentication
+BITTENSOR_API_TOKEN=your_api_token_here
