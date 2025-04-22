@@ -1,136 +1,21 @@
-import OAuthProvider from '@cloudflare/workers-oauth-provider'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { McpAgent } from 'agents/mcp'
-import { z } from 'zod'
-import app from './app'
-import { BITTENSOR_ENDPOINTS, SERVER_CONFIG } from './constants'
-import { callBittensorAPI } from './utils/api'
+import { Hono } from "hono";
+import { handleMcpRequest } from "./handlers"; 
+import { renderHomePage } from "./ui";
 
 // Define environment interface
 export interface Env {
-  BITTENSOR_API_TOKEN: string
-  [key: string]: any
+  BITTENSOR_API_TOKEN: string;
+  [key: string]: any;
 }
 
-export class BittensorMCP extends McpAgent {
-  server = new McpServer({
-    name: SERVER_CONFIG.NAME,
-    version: SERVER_CONFIG.VERSION,
-  })
+// Create Hono app
+const app = new Hono<{ Bindings: Env }>();
 
-  async init() {
-    // Image detection tool
-    this.server.tool(
-      'detect-image',
-      { image: z.string().url() },
-      async ({ image }) => {
-        try {
-          // @ts-ignore - Access environment variables
-          const apiToken = this.env.BITTENSOR_API_TOKEN
+// Home page
+app.get("/", renderHomePage);
 
-          if (!apiToken) {
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: 'Error: Bittensor API token not configured',
-                },
-              ],
-            }
-          }
+// Register the MCP endpoint
+app.post("/v1/mcp", handleMcpRequest);
 
-          // Call the Bittensor API
-          const result = await callBittensorAPI(
-            BITTENSOR_ENDPOINTS.DETECT_IMAGE,
-            { image },
-            apiToken
-          )
-
-          return {
-            content: [
-              { type: 'text', text: 'Image detection results:' },
-              { type: 'text', text: JSON.stringify(result, null, 2) },
-            ],
-          }
-        } catch (error) {
-          console.error('Image detection error:', error)
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Error processing image: ${
-                  error instanceof Error ? error.message : 'Unknown error'
-                }`,
-              },
-            ],
-          }
-        }
-      }
-    )
-
-    // Text analysis tool
-    this.server.tool(
-      'analyze-text',
-      {
-        text: z.string(),
-        options: z.object({}).optional(),
-      },
-      async ({ text, options = {} }) => {
-        try {
-          // @ts-ignore - Access environment variables
-          const apiToken = this.env.BITTENSOR_API_TOKEN
-
-          if (!apiToken) {
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: 'Error: Bittensor API token not configured',
-                },
-              ],
-            }
-          }
-
-          // Call the Bittensor API
-          const result = await callBittensorAPI(
-            BITTENSOR_ENDPOINTS.TEXT_ANALYSIS,
-            { text, options },
-            apiToken
-          )
-
-          return {
-            content: [
-              { type: 'text', text: 'Text analysis results:' },
-              { type: 'text', text: JSON.stringify(result, null, 2) },
-            ],
-          }
-        } catch (error) {
-          console.error('Text analysis error:', error)
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Error processing text: ${
-                  error instanceof Error ? error.message : 'Unknown error'
-                }`,
-              },
-            ],
-          }
-        }
-      }
-    )
-  }
-}
-
-// Export the OAuth handler as the default
-export default new OAuthProvider({
-  apiRoute: '/sse',
-  // TODO: fix these types
-  // @ts-ignore
-  apiHandler: BittensorMCP.mount('/sse'),
-  // @ts-ignore
-  defaultHandler: app,
-  authorizeEndpoint: '/authorize',
-  tokenEndpoint: '/token',
-  clientRegistrationEndpoint: '/register',
-})
+// Export the app as the default handler
+export default app;
