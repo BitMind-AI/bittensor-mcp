@@ -133,6 +133,32 @@ curl -X POST "http://localhost:8787/v1/mcp" \
   }'
 ```
 
+### Test the chat endpoint:
+
+```bash
+curl -X POST "http://localhost:8787/v1/mcp" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request": {
+      "function": "chat",
+      "parameters": {
+        "model": "llama-3",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello, how are you?"
+          }
+        ],
+        "temperature": 0.1,
+        "max_tokens": 500,
+        "top_p": 1,
+        "stream": false,
+        "logprobs": false
+      }
+    }
+  }'
+```
+
 ## Deployment
 
 1. Set your API token as a secret:

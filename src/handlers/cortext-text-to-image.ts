@@ -5,20 +5,29 @@ import { BITTENSOR_ENDPOINTS, ERROR_MESSAGES } from "../constants";
 import { createMcpResponse } from "../utils/response";
 
 /**
- * Handler for text analysis requests
- * NOTE: Uncomment and update this when implementing text analysis endpoint
+ * Handler for Cortext text-to-image requests
  */
-export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, parameters: any) {
+export async function cortextTextToImageHandler(c: Context<{ Bindings: Env }>, parameters: any) {
   try {
     // Validate parameters
-    if (!parameters || !parameters.text) {
+    if (!parameters || !parameters.prompt) {
       return c.json({ 
         error: ERROR_MESSAGES.MISSING_PARAMETERS,
-        message: "Missing required parameter: text"
+        message: "Missing required parameter: prompt"
       }, 400);
     }
 
-    const { text, options = {} } = parameters;
+    const { 
+      prompt,
+      model = "cortext-image",
+      style = "vivid",
+      size = "1024x1024",
+      quality = "hd",
+      steps = 30,
+      cfg_scale = 8,
+      seed = 0
+    } = parameters;
+
     const apiToken = c.env.BITTENSOR_API_TOKEN;
     
     if (!apiToken) {
@@ -27,14 +36,18 @@ export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, paramet
       }, 500);
     }
     
-    // Uncomment when the endpoint is available in constants.ts
-    
     // Call the Bittensor API
     const result = await callBittensorAPI(
-      BITTENSOR_ENDPOINTS.TEXT_ANALYSIS,
+      BITTENSOR_ENDPOINTS.CORTEXT_TEXT_TO_IMAGE,
       { 
-        text,
-        options
+        prompt,
+        model,
+        style,
+        size,
+        quality,
+        steps,
+        cfg_scale,
+        seed
       },
       apiToken
     );
@@ -43,7 +56,7 @@ export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, paramet
     return createMcpResponse([
       {
         type: "text",
-        text: "Text analysis results:"
+        text: "Cortext text-to-image results:"
       },
       {
         type: "text",
@@ -51,10 +64,10 @@ export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, paramet
       }
     ]);
   } catch (error) {
-    console.error("Text analysis error:", error);
+    console.error("Cortext text-to-image error:", error);
     return c.json({ 
       error: ERROR_MESSAGES.API_ERROR,
-      message: error instanceof Error ? error.message : "Unknown error processing text"
+      message: error instanceof Error ? error.message : "Unknown error processing Cortext text-to-image request"
     }, 500);
   }
-}
+} 

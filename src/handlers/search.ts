@@ -5,20 +5,26 @@ import { BITTENSOR_ENDPOINTS, ERROR_MESSAGES } from "../constants";
 import { createMcpResponse } from "../utils/response";
 
 /**
- * Handler for text analysis requests
- * NOTE: Uncomment and update this when implementing text analysis endpoint
+ * Handler for search requests
  */
-export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, parameters: any) {
+export async function searchHandler(c: Context<{ Bindings: Env }>, parameters: any) {
   try {
     // Validate parameters
-    if (!parameters || !parameters.text) {
+    if (!parameters || !parameters.prompt) {
       return c.json({ 
         error: ERROR_MESSAGES.MISSING_PARAMETERS,
-        message: "Missing required parameter: text"
+        message: "Missing required parameter: prompt"
       }, 400);
     }
 
-    const { text, options = {} } = parameters;
+    const { 
+      prompt,
+      tools = ["Google Search"],
+      model = "NOVA",
+      response_order = "LINKS_FIRST",
+      date_filter = "PAST_WEEK"
+    } = parameters;
+
     const apiToken = c.env.BITTENSOR_API_TOKEN;
     
     if (!apiToken) {
@@ -27,14 +33,15 @@ export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, paramet
       }, 500);
     }
     
-    // Uncomment when the endpoint is available in constants.ts
-    
     // Call the Bittensor API
     const result = await callBittensorAPI(
-      BITTENSOR_ENDPOINTS.TEXT_ANALYSIS,
+      BITTENSOR_ENDPOINTS.SEARCH,
       { 
-        text,
-        options
+        prompt,
+        tools,
+        model,
+        response_order,
+        date_filter
       },
       apiToken
     );
@@ -43,7 +50,7 @@ export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, paramet
     return createMcpResponse([
       {
         type: "text",
-        text: "Text analysis results:"
+        text: "Search results:"
       },
       {
         type: "text",
@@ -51,10 +58,10 @@ export async function textAnalysisHandler(c: Context<{ Bindings: Env }>, paramet
       }
     ]);
   } catch (error) {
-    console.error("Text analysis error:", error);
+    console.error("Search error:", error);
     return c.json({ 
       error: ERROR_MESSAGES.API_ERROR,
-      message: error instanceof Error ? error.message : "Unknown error processing text"
+      message: error instanceof Error ? error.message : "Unknown error processing search request"
     }, 500);
   }
-}
+} 

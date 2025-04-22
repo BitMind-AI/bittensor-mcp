@@ -2,6 +2,13 @@ import { Context } from "hono";
 import { Env } from "../index";
 import { imageDetectionHandler } from "./detect-image";
 import { textAnalysisHandler } from "./text-analysis";
+import { chatHandler } from "./chat";
+import { qnaHandler } from "./qna";
+import { cortextChatHandler } from "./cortext-chat";
+import { cortextTextToImageHandler } from "./cortext-text-to-image";
+import { visionChatHandler } from "./vision-chat";
+import { visionTextToImageHandler } from "./vision-text-to-image";
+import { searchHandler } from "./search";
 import { ERROR_MESSAGES } from "../constants";
 
 /**
@@ -24,9 +31,29 @@ export async function handleMcpRequest(c: Context<{ Bindings: Env }>) {
       case 'detect-image':
         return await imageDetectionHandler(c, parameters);
       
-      // Add more endpoints here
       case 'analyze-text':
         return await textAnalysisHandler(c, parameters);
+      
+      case 'chat':
+        return await chatHandler(c, parameters);
+      
+      case 'qna':
+        return await qnaHandler(c, parameters);
+      
+      case 'cortext-chat':
+        return await cortextChatHandler(c, parameters);
+      
+      case 'cortext-text-to-image':
+        return await cortextTextToImageHandler(c, parameters);
+      
+      case 'vision-chat':
+        return await visionChatHandler(c, parameters);
+      
+      case 'vision-text-to-image':
+        return await visionTextToImageHandler(c, parameters);
+      
+      case 'search':
+        return await searchHandler(c, parameters);
       
       default:
         return c.json({ 
