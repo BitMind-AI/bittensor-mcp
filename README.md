@@ -95,22 +95,48 @@ curl -X POST "https://your-worker.workers.dev/v1/mcp" \
     "request": {
       "function": "detect-image",
       "parameters": {
-        "image": "https://example.com/image.jpg"
+        "image": "https://picsum.photos/256"
       }
     }
   }'
 ```
 
-### Text Analysis
+### Test the text analysis endpoint:
 
 ```bash
-curl -X POST "https://your-worker.workers.dev/v1/mcp" \
+curl -X POST "http://localhost:8787/v1/mcp" \
   -H "Content-Type: application/json" \
   -d '{
     "request": {
-      "function": "analyze-text",
+      "function": "chat",
       "parameters": {
-        "text": "Your text to analyze"
+        "text": "This is a sample text to analyze. This is a sample text to analyze."
+      }
+    }
+  }'
+```
+
+### Test the chat endpoint:
+
+```bash
+curl -X POST "http://localhost:8787/v1/mcp" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request": {
+      "function": "chat",
+      "parameters": {
+        "model": "llama-3",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello, how are you?"
+          }
+        ],
+        "temperature": 0.1,
+        "max_tokens": 500,
+        "top_p": 1,
+        "stream": false,
+        "logprobs": false
       }
     }
   }'
