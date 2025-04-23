@@ -20,7 +20,7 @@ export const BITTENSOR_ENDPOINTS = {
 
 // Server configuration
 export const SERVER_CONFIG = {
-  NAME: 'Bittensor MCP Server',
+  NAME: 'Bittensor MCP by BitMind',
   VERSION: '1.0.0',
 }
 
