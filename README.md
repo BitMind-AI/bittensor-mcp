@@ -10,6 +10,13 @@ This server acts as a bridge between MCP-compatible clients (like Claude, GPT-4,
 
 - **Image Detection**: Analyze images using Bittensor's neural network
 - **Text Analysis**: Process and analyze text using Bittensor's language models
+- **Chat**: Interact with Bittensor's language models
+- **QnA**: Get answers to questions using Bittensor's language models
+- **Search**: Search the web using Bittensor's search capabilities
+- **Text-to-Image**: Generate images from text prompts
+- **Image-to-Image**: Transform images based on text prompts
+- **Cortext Chat**: Chat with Cortext language models
+- **Cortext Completions**: Generate completions using Cortext language models
 - **OAuth Authentication**: Secure access to the MCP server
 - **SSE Support**: Compatible with MCP Inspector for testing and debugging
 

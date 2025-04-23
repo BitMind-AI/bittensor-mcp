@@ -22,8 +22,9 @@ This document outlines the key changes made from the original `bittensor-mcp` re
 ## Feature Changes
 
 1. **Endpoints**
+   - Expanded functionality to include all Bittensor API endpoints
+   - Added chat, QnA, search, text-to-image, image-to-image, and Cortext capabilities
    - Maintained core functionality of image detection and text analysis
-   - Removed example "add" tool to focus on Bittensor-specific capabilities
    - Updated endpoint URLs to follow MCP standards
 
 2. **UI Improvements**
