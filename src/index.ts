@@ -9,7 +9,9 @@ const API_TOKEN = process.env.BITMIND_API_TOKEN;
 
 // Validate required configuration
 if (!API_TOKEN) {
-  console.error("Error: BITMIND_API_TOKEN environment variable is required");
+  process.stderr.write(
+    "Error: BITMIND_API_TOKEN environment variable is required\n"
+  );
   process.exit(1);
 }
 
@@ -27,12 +29,17 @@ const server = new McpServer({
 registerGeneratedRoutes(server);
 
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.log("Bittensor MCP Server running on stdio");
+  try {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    process.stderr.write("Bittensor MCP Server running on stdio\n");
+  } catch (error) {
+    process.stderr.write(`Error: ${error}\n`);
+    process.exit(1);
+  }
 }
 
 main().catch((error) => {
-  console.error("Fatal error in main():", error);
+  process.stderr.write(`Fatal error in main(): ${error}\n`);
   process.exit(1);
 });
