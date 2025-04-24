@@ -1,0 +1,27 @@
+# Source files
+src/
+scripts/
+tsconfig.json
+
+# Git files
+.git
+.gitignore
+.github/
+
+# Development files
+node_modules/
+*.log
+*.tgz
+
+# Subnet registry
+subnet-io-registry/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
