@@ -10,11 +10,8 @@ on:
       force_tag:
         description: 'Force tag creation even if version has not changed'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        default: false
+        type: boolean
 
 permissions:
   contents: write
