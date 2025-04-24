@@ -145,7 +145,8 @@ When you push the tag, GitHub Actions will:
 3. Install dependencies
 4. Generate the OpenAPI spec and API client
 5. Build the project
-6. Publish the package to npm
+6. Create a GitHub Release with automatically generated release notes
+7. Publish the package to npm
 
 **Important Note**: The tag will appear in GitHub releases regardless of which branch it was created on. However, it's recommended to create tags from the main branch to ensure consistency. If you create a tag from a feature branch, the code at that specific commit will be published, which might not include changes from other branches.
 
