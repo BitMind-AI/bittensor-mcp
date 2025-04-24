@@ -108,12 +108,26 @@ For the GitHub Actions workflow to work, you need to set up the following secret
 
 - `NPM_TOKEN`: An npm access token with publish permissions
 
+**Token Type**: You can use either a classic npm token or a granular access token:
+- **Classic Token**: Simpler to set up but has broader permissions
+- **Granular Token**: More secure as you can limit permissions to only what's needed
+  - If using a granular token, ensure it has the following permissions:
+    - Read and write access to packages
+    - Scope limited to the specific package or organization
+
 To add this secret:
 1. Go to your GitHub repository
 2. Click on "Settings" > "Secrets and variables" > "Actions"
 3. Click "New repository secret"
 4. Name: `NPM_TOKEN`
 5. Value: Your npm access token
+
+To create an npm token:
+1. Go to npmjs.com and log in
+2. Click on your profile icon > "Access Tokens"
+3. Choose "Generate New Token" (classic or granular)
+4. For granular tokens, select the appropriate permissions
+5. Copy the token immediately (it won't be shown again)
 
 #### Creating a Release
 
