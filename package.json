@@ -1,11 +1,11 @@
 {
-  "name": "@bitmind/bittensor-mcp",
-  "version": "1.0.0",
+  "name": "@bitmind/bittensor-mcp-dev",
+  "version": "1.0.2",
   "description": "Model Context Protocol (MCP) server for Bittensor API",
   "main": "build/index.js",
   "type": "module",
   "bin": {
-    "bittensor-mcp": "./build/index.js"
+    "bittensor-mcp-dev": "./build/index.js"
   },
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
