@@ -6,6 +6,9 @@ on:
       - main
       - mcp-release-workflow-test
 
+permissions:
+  contents: write
+
 jobs:
   check-version:
     runs-on: ubuntu-latest
