@@ -100,15 +100,14 @@ npm install /path/to/bitmind-bittensor-mcp-1.0.0.tgz
 
 ### Automated GitHub Actions Workflow
 
-This project uses GitHub Actions for automated releases. The release process is now fully automated with two workflows:
+This project uses GitHub Actions for automated releases. The release process is now fully automated with a single workflow:
 
-1. **Version Check Workflow**: Triggered on every push to the main branch
+**Version Check and Release Workflow**: Triggered on every push to the main branch or manually
    - Checks if the version in package.json has changed
-   - If changed, automatically creates and pushes a tag matching the version
-
-2. **Release Workflow**: Triggered when a tag starting with 'v' is pushed
-   - Builds the project and publishes it to npm
-   - Creates a GitHub Release with automatically generated release notes
+   - If changed (or if manually triggered with force option), it:
+     - Creates and pushes a tag matching the version
+     - Builds the project and publishes it to npm
+     - Creates a GitHub Release with automatically generated release notes
 
 #### Required GitHub Secrets
 
@@ -162,7 +161,7 @@ With the automated workflow, creating a release is now much simpler:
 If the release workflow fails for any reason, you can re-run it without having to increment the version number:
 
 1. Go to the GitHub Actions tab in your repository
-2. Select the "Version Check and Tag" workflow
+2. Select the "Version Check and Release" workflow
 3. Click "Run workflow" button in the top right corner
 4. Select the branch containing the version you want to release
 5. Check the "Force tag creation even if version has not changed" checkbox
