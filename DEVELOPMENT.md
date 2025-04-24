@@ -100,15 +100,14 @@ npm install /path/to/bitmind-bittensor-mcp-1.0.0.tgz
 
 ### Automated GitHub Actions Workflow
 
-This project uses GitHub Actions for automated releases. The release process is now fully automated with two workflows:
+This project uses GitHub Actions for automated releases. The release process is now fully automated with a single workflow:
 
-1. **Version Check Workflow**: Triggered on every push to the main branch
+**Version Check and Release Workflow**: Triggered on every push to the main branch or manually
    - Checks if the version in package.json has changed
-   - If changed, automatically creates and pushes a tag matching the version
-
-2. **Release Workflow**: Triggered when a tag starting with 'v' is pushed
-   - Builds the project and publishes it to npm
-   - Creates a GitHub Release with automatically generated release notes
+   - If changed (or if manually triggered with force option), it:
+     - Creates and pushes a tag matching the version
+     - Builds the project and publishes it to npm
+     - Creates a GitHub Release with automatically generated release notes
 
 #### Required GitHub Secrets
 
@@ -143,10 +142,9 @@ With the automated workflow, creating a release is now much simpler:
 
 1. Update the version in package.json
 2. Commit and push your changes to the main branch
-3. The Version Check workflow will automatically:
+3. The Version Check and Release workflow will automatically:
    - Detect the version change
    - Create and push a tag matching the new version
-4. The Release workflow will then:
    - Check out the code with submodules
    - Set up Node.js 22.x and Python
    - Install dependencies
@@ -156,6 +154,19 @@ With the automated workflow, creating a release is now much simpler:
    - Publish the package to npm
 
 **Important Note**: This automated process only works for changes pushed to the main branch. If you need to create a release from another branch, you'll need to manually create and push a tag.
+
+#### Re-running a Failed Release
+
+If the release workflow fails for any reason, you can re-run it without having to increment the version number:
+
+1. Go to the GitHub Actions tab in your repository
+2. Select the "Version Check and Release" workflow
+3. Click "Run workflow" button in the top right corner
+4. Select the branch containing the version you want to release
+5. Check the "Force tag creation even if version has not changed" checkbox
+6. Click "Run workflow"
+
+This will create a new tag with the current version in package.json, even if it hasn't changed since the last commit. The tag creation process will automatically delete any existing tag with the same version before creating a new one.
 
 #### Manual Release (Alternative)
 
