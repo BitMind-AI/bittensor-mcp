@@ -5,6 +5,16 @@ on:
     branches:
       - main
       - mcp-release-workflow-test
+  workflow_dispatch:
+    inputs:
+      force_tag:
+        description: 'Force tag creation even if version has not changed'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 permissions:
   contents: write
@@ -29,6 +39,14 @@ jobs:
           # Get current package.json version
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
+          echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # For workflow_dispatch with force_tag=true, we don't need to compare versions
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.force_tag }}" == "true" ]]; then
+            echo "Force tag creation requested"
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           
           # Get the package.json from the previous commit
           git checkout HEAD~1 package.json
@@ -42,7 +60,6 @@ jobs:
           if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
             echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
             echo "version_changed=true" >> $GITHUB_OUTPUT
-            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           else
             echo "Version unchanged"
             echo "version_changed=false" >> $GITHUB_OUTPUT
@@ -57,6 +74,15 @@ jobs:
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Check if tag already exists
+          if git ls-remote --tags origin | grep -q "refs/tags/v$NEW_VERSION"; then
+            echo "Tag v$NEW_VERSION already exists. Deleting it..."
+            # Delete the tag locally if it exists
+            git tag -d "v$NEW_VERSION" || true
+            # Delete the tag on the remote
+            git push --delete origin "v$NEW_VERSION" || true
+          fi
           
           # Create and push tag
           git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
