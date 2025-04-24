@@ -44,7 +44,26 @@ async function makeApiRequest<T>(
     throw new Error(`API request failed: ${response.status} ${error}`);
   }
 
-  return response.json() as Promise<T>;
+  // Get the response as text first
+  const responseText = await response.text();
+  
+  // Try to parse as JSON, but handle non-JSON responses gracefully
+  try {
+    // Check if the response starts with special prefixes like "data:" or "debug:"
+    if (responseText.trim().startsWith('data:') || 
+        responseText.trim().startsWith('debug:') ||
+        responseText.includes('<!DOCTYPE html>')) {
+      // Return the raw text if it's not JSON
+      return responseText as unknown as T;
+    }
+    
+    // Try to parse as JSON
+    return JSON.parse(responseText);
+  } catch (error) {
+    // If JSON parsing fails, return the raw text
+    console.error("Failed to parse response as JSON:", error);
+    return responseText as unknown as T;
+  }
 }
 
 

@@ -32,7 +32,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -72,7 +76,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -115,7 +123,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -155,7 +167,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -192,7 +208,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -230,7 +250,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -270,7 +294,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -310,7 +338,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -346,7 +378,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -384,7 +420,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -418,7 +458,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -451,7 +495,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -484,7 +532,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -516,7 +568,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -548,7 +604,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -581,7 +641,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -619,7 +683,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -662,7 +730,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
@@ -702,7 +774,11 @@ export function registerGeneratedRoutes(server: McpServer) {
           content: [
             {
               type: "text",
-              text: typeof response === "string" ? response : JSON.stringify(response),
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
             },
           ],
         };
