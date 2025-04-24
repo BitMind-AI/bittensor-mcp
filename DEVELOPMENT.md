@@ -163,10 +163,9 @@ If the release workflow fails for any reason, you can re-run it without having t
 
 1. Go to the GitHub Actions tab in your repository
 2. Select the "Version Check and Tag" workflow
-3. Click "Run workflow"
+3. Click "Run workflow" button in the top right corner
 4. Select the branch containing the version you want to release
-5. Set "Force tag creation even if version has not changed" to "true"
-6. Click "Run workflow"
+5. Click "Run workflow"
 
 This will create a new tag with the current version in package.json, even if it hasn't changed since the last commit. The tag creation process will automatically delete any existing tag with the same version before creating a new one.
 
