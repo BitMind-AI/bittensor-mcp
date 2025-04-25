@@ -31,7 +31,7 @@ function shouldBeNumeric(key, value) {
     'temperature',
     'top_p',
     'frequency_penalty',
-    'presence_penalty',
+    'presence_penalty'
   ]
   return (
     numericFields.includes(key) ||
@@ -69,7 +69,7 @@ export async function ${operationId}(params: any): Promise<any> {
 
   return {
     responseTypes: Array.from(responseTypes).join('\n\n'),
-    apiFunctions: apiFunctions.join('\n'),
+    apiFunctions: apiFunctions.join('\n')
   }
 }
 
@@ -158,6 +158,40 @@ ${zodSchema}
         const response = await api.subnet_${path
           .replace(/[\/-]/g, '_')
           .slice(1)}(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "${operationId}";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = \`bittensor://\${operationId}/image\`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
