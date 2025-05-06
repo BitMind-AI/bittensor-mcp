@@ -28,6 +28,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_1_chat(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "1-chat";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -72,6 +106,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_4_completions(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "4-completions";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -119,6 +187,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_4_chat(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "4-chat";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -163,6 +265,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_19_chat_completions(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "19-chat-completions";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -204,6 +340,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_19_completions(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "19-completions";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -246,6 +416,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_19_text_to_image(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "19-text-to-image";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -290,6 +494,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_19_image_to_image(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "19-image-to-image";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -334,6 +572,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_19_avatar(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "19-avatar";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -374,6 +646,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_20_chat(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "20-chat";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -416,6 +722,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_22_search(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "22-search";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -454,6 +794,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_22_search_links_web(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "22-search-links-web";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -491,6 +865,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_22_search_links_twitter(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "22-search-links-twitter";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -528,6 +936,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_32_detect_text(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "32-detect-text";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -564,6 +1006,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_34_detect_image(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "34-detect-image";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -600,6 +1076,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_34_detect_video(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "34-detect-video";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -637,6 +1147,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_47_compress_text(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "47-compress-text";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -679,6 +1223,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_47_compress_messages(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "47-compress-messages";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -726,6 +1304,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_64_chat_completions(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "64-chat-completions";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
@@ -770,6 +1382,40 @@ export function registerGeneratedRoutes(server: McpServer) {
     async (params) => {
       try {
         const response = await api.subnet_64_completions(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "64-completions";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
         return {
           content: [
             {
