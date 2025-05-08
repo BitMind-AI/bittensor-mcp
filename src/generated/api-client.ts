@@ -76,15 +76,8 @@ export async function subnet_1_chat(params: any): Promise<any> {
   });
 }
 
-export async function subnet_4_completions(params: any): Promise<any> {
-  return makeApiRequest(`/4/completions`, {
-    method: "POST",
-    body: params,
-  });
-}
-
-export async function subnet_4_chat(params: any): Promise<any> {
-  return makeApiRequest(`/4/chat`, {
+export async function subnet_18_predict(params: any): Promise<any> {
+  return makeApiRequest(`/18/predict`, {
     method: "POST",
     body: params,
   });
@@ -153,6 +146,66 @@ export async function subnet_22_search_links_twitter(params: any): Promise<any> 
   });
 }
 
+export async function subnet_22_twitter(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_urls(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/urls`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_post(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/post`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_user_posts(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/user/posts`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_user_latest(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/user/latest`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_user_replies(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/user/replies`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_post_replies(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/post/replies`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_post_retweets(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/post/retweets`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_twitter_user(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/twitter/user`, {
+    method: "GET"
+  });
+}
+
+export async function subnet_22_web(params: any = {}): Promise<any> {
+  return makeApiRequest(`/22/web`, {
+    method: "GET"
+  });
+}
+
 export async function subnet_32_detect_text(params: any): Promise<any> {
   return makeApiRequest(`/32/detect-text`, {
     method: "POST",
@@ -171,6 +224,47 @@ export async function subnet_34_detect_video(params: any): Promise<any> {
   return makeApiRequest(`/34/detect-video`, {
     method: "POST",
     body: params,
+  });
+}
+
+export async function subnet_42_search(params: any): Promise<any> {
+  return makeApiRequest(`/42/search`, {
+    method: "POST",
+    body: params,
+  });
+}
+
+// Interface for subnet_42_status_by_jobUUID parameters
+interface Subnet_42_status_by_jobUUIDParams {
+  jobUUID: string;
+}
+
+export async function subnet_42_status_by_jobUUID(params: Subnet_42_status_by_jobUUIDParams): Promise<any> {
+  // Replace path parameters with actual values
+  let url = `/42/status/{jobUUID}`;
+  for (const [key, value] of Object.entries(params)) {
+    url = url.replace(`{${key}}`, value);
+  }
+  
+  return makeApiRequest(url, {
+    method: "GET"
+  });
+}
+
+// Interface for subnet_42_result_by_jobUUID parameters
+interface Subnet_42_result_by_jobUUIDParams {
+  jobUUID: string;
+}
+
+export async function subnet_42_result_by_jobUUID(params: Subnet_42_result_by_jobUUIDParams): Promise<any> {
+  // Replace path parameters with actual values
+  let url = `/42/result/{jobUUID}`;
+  for (const [key, value] of Object.entries(params)) {
+    url = url.replace(`{${key}}`, value);
+  }
+  
+  return makeApiRequest(url, {
+    method: "GET"
   });
 }
 

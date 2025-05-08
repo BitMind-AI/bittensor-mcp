@@ -1,4 +1,5 @@
 import fs from 'fs'
+import yaml from 'js-yaml'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -10,6 +11,7 @@ const OPENAPI_PATH = path.join(
   'docs',
   'openapi.json'
 )
+const SUBNETS_DIR = path.join(__dirname, '..', 'subnet-io-registry', 'subnets')
 const OUTPUT_DIR = path.join(__dirname, '..', 'src', 'generated')
 
 // Ensure the output directory exists
@@ -19,6 +21,62 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 
 // Read the OpenAPI spec
 const openapiSpec = JSON.parse(fs.readFileSync(OPENAPI_PATH, 'utf-8'))
+
+// Read the external paths from the API YAML files
+const externalPaths = {}
+
+// Function to read external paths from API YAML files
+function readExternalPaths() {
+  // Get all subnet directories
+  const subnetDirs = fs.readdirSync(SUBNETS_DIR)
+
+  for (const subnetDir of subnetDirs) {
+    const subnetPath = path.join(SUBNETS_DIR, subnetDir)
+
+    // Skip if not a directory
+    if (!fs.statSync(subnetPath).isDirectory()) {
+      continue
+    }
+
+    // Check if api.yml exists
+    const apiYamlPath = path.join(subnetPath, 'api.yml')
+    if (!fs.existsSync(apiYamlPath)) {
+      continue
+    }
+
+    try {
+      // Read and parse the API YAML file
+      const apiYaml = yaml.load(fs.readFileSync(apiYamlPath, 'utf8'))
+
+      // Process endpoints
+      if (apiYaml.endpoints) {
+        for (const endpoint of apiYaml.endpoints) {
+          if (endpoint.externalPath) {
+            // Create a key based on the subnet ID and path
+            let apiPath = `/${subnetDir}${endpoint.path}`
+
+            // Handle path parameters
+            if (endpoint.pathParams) {
+              for (const param of endpoint.pathParams) {
+                if (param.name) {
+                  apiPath = `/${subnetDir}${endpoint.path}/{${param.name}}`
+                }
+              }
+            }
+
+            // Store the external path
+            externalPaths[apiPath] = endpoint.externalPath
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`Error reading API YAML file ${apiYamlPath}:`, error)
+    }
+  }
+}
+
+// Read external paths
+readExternalPaths()
 
 // Helper function to determine if a field should be numeric
 function shouldBeNumeric(key, value) {
@@ -46,6 +104,7 @@ const generateApiClientContent = (paths) => {
   const responseTypes = new Set()
 
   for (const [path, methods] of Object.entries(paths)) {
+    // Handle POST methods
     const postMethod = methods.post
     if (postMethod) {
       const operationId = `subnet_${path.replace(/[\/-]/g, '_').slice(1)}`
@@ -57,13 +116,79 @@ const generateApiClientContent = (paths) => {
         responseTypes.add(responseType)
       }
 
+      // Always use the original path, not the external path
+      const requestPath = path
+
       apiFunctions.push(`
 export async function ${operationId}(params: any): Promise<any> {
-  return makeApiRequest(\`${path}\`, {
+  return makeApiRequest(\`${requestPath}\`, {
     method: "POST",
     body: params,
   });
 }`)
+    }
+
+    // Handle GET methods
+    const getMethod = methods.get
+    if (getMethod) {
+      const operationId = `subnet_${path.replace(/[\/-]/g, '_').slice(1)}`
+      const responseSchema =
+        getMethod.responses['200']?.content?.['application/json']?.schema
+
+      if (responseSchema) {
+        const responseType = generateTypeScriptType(responseSchema)
+        responseTypes.add(responseType)
+      }
+
+      // Check if the path has parameters
+      const pathParams =
+        getMethod.parameters?.filter((param) => param.in === 'path') || []
+
+      // Always use the original path, not the external path
+      const requestPath = path
+
+      if (pathParams.length > 0) {
+        // Create a more readable operationId for paths with parameters
+        const pathParts = path.split('/')
+        const subnetId = pathParts[1]
+        // Remove the path parameter placeholders from the endpoint name
+        const endpointName = pathParts
+          .slice(2)
+          .join('_')
+          .replace(/[\/-]/g, '_')
+          .replace(/\{([^}]+)\}/g, '')
+        const sanitizedOperationId = `subnet_${subnetId}_${endpointName}by_${pathParams.map((p) => p.name).join('_and_')}`
+
+        // Create a typed interface for the parameters
+        const paramsInterface = pathParams
+          .map((param) => `  ${param.name}: string;`)
+          .join('\n')
+
+        apiFunctions.push(`
+// Interface for ${sanitizedOperationId} parameters
+interface ${sanitizedOperationId.charAt(0).toUpperCase() + sanitizedOperationId.slice(1)}Params {
+${paramsInterface}
+}
+
+export async function ${sanitizedOperationId}(params: ${sanitizedOperationId.charAt(0).toUpperCase() + sanitizedOperationId.slice(1)}Params): Promise<any> {
+  // Replace path parameters with actual values
+  let url = \`${requestPath}\`;
+  for (const [key, value] of Object.entries(params)) {
+    url = url.replace(\`{$\{key}}\`, value);
+  }
+  
+  return makeApiRequest(url, {
+    method: "GET"
+  });
+}`)
+      } else {
+        apiFunctions.push(`
+export async function ${operationId}(params: any = {}): Promise<any> {
+  return makeApiRequest(\`${requestPath}\`, {
+    method: "GET"
+  });
+}`)
+      }
     }
   }
 
@@ -102,6 +227,7 @@ const generateRoutesContent = (paths) => {
   const routes = []
 
   for (const [path, methods] of Object.entries(paths)) {
+    // Handle POST methods
     const postMethod = methods.post
     if (postMethod) {
       const operationId =
@@ -132,6 +258,9 @@ const generateRoutesContent = (paths) => {
             } else {
               type = `z.array(${generateZodType(value.items)})`
             }
+          } else if (value.type === 'object') {
+            // Handle nested objects properly
+            type = generateZodType(value)
           } else if (value.enum) {
             type = `z.enum([${value.enum.map((e) => `"${e}"`).join(', ')}])`
           }
@@ -148,7 +277,7 @@ const generateRoutesContent = (paths) => {
       routes.push(`
   // Register ${operationId} endpoint
   server.tool(
-    "${operationId}",
+    "${operationId.replace(/\{([^}]+)\}/g, 'by_$1')}",
     "${summary}",
     {
 ${zodSchema}
@@ -218,6 +347,131 @@ ${zodSchema}
     }
   );`)
     }
+
+    // Handle GET methods
+    const getMethod = methods.get
+    if (getMethod) {
+      const operationId =
+        getMethod.operationId || path.replace(/\//g, '-').slice(1)
+      const summary = getMethod.summary || ''
+
+      // Check if the path has parameters
+      const pathParams =
+        getMethod.parameters?.filter((param) => param.in === 'path') || []
+
+      // Generate Zod schema for path parameters
+      const zodSchema = pathParams
+        .map((param) => {
+          const description = param.description
+            ? `.describe(${JSON.stringify(param.description)})`
+            : ''
+          let type = 'z.string()'
+
+          if (
+            param.schema?.type === 'integer' ||
+            param.schema?.type === 'number'
+          ) {
+            type = 'z.string().transform(val => parseInt(val))'
+          }
+
+          return `      ${param.name}: ${type}${description}`
+        })
+        .join(',\n')
+
+      // Generate route registration for GET endpoints
+      if (pathParams.length > 0) {
+        // Create a more readable operationId for paths with parameters
+        const pathParts = path.split('/')
+        const subnetId = pathParts[1]
+        // Remove the path parameter placeholders from the endpoint name
+        const endpointName = pathParts
+          .slice(2)
+          .join('_')
+          .replace(/[\/-]/g, '_')
+          .replace(/\{([^}]+)\}/g, '')
+        const sanitizedOperationId = `subnet_${subnetId}_${endpointName}by_${pathParams.map((p) => p.name).join('_and_')}`
+
+        routes.push(`
+  // Register ${operationId} endpoint
+  server.tool(
+    "${operationId.replace(/\{([^}]+)\}/g, 'by_$1')}",
+    "${summary}",
+    {
+${zodSchema || '      // No parameters required'}
+    },
+    async (params) => {
+      try {
+        const response = await api.${sanitizedOperationId}(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: \`Error: \${error?.message || "Unknown error occurred"}\`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );`)
+      } else {
+        routes.push(`
+  // Register ${operationId} endpoint
+  server.tool(
+    "${operationId}",
+    "${summary}",
+    {
+${zodSchema || '      // No parameters required'}
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_${path
+          .replace(/[\/-]/g, '_')
+          .slice(1)}(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: \`Error: \${error?.message || "Unknown error occurred"}\`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );`)
+      }
+    }
   }
 
   return routes.join('\n')
@@ -228,16 +482,41 @@ function generateZodType(schema) {
   if (schema.type === 'object') {
     const properties = Object.entries(schema.properties || {})
       .map(([key, value]) => {
-        return `${key}: ${generateZodType(value)}`
+        // Check if the property is required
+        const isRequired = (schema.required || []).includes(key)
+
+        // Generate the property type
+        let propType = generateZodType(value)
+
+        // Add default value if present
+        if (value.default !== undefined) {
+          propType += `.default(${JSON.stringify(value.default)})`
+        }
+
+        // Add optional modifier if not required
+        if (!isRequired) {
+          propType += '.optional()'
+        }
+
+        // Add description if present
+        if (value.description) {
+          propType += `.describe(${JSON.stringify(value.description)})`
+        }
+
+        return `${key}: ${propType}`
       })
       .join(', ')
     return `z.object({ ${properties} })`
   } else if (schema.type === 'string') {
-    return 'z.string()'
+    return schema.enum
+      ? `z.enum([${schema.enum.map((e) => `"${e}"`).join(', ')}])`
+      : 'z.string()'
   } else if (schema.type === 'number' || schema.type === 'integer') {
     return 'z.number()'
   } else if (schema.type === 'boolean') {
     return 'z.boolean()'
+  } else if (schema.type === 'array') {
+    return `z.array(${generateZodType(schema.items)})`
   } else if (schema.enum) {
     return `z.enum([${schema.enum.map((e) => `"${e}"`).join(', ')}])`
   }

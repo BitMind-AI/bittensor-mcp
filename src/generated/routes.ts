@@ -12,9 +12,9 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 1-chat endpoint
   server.tool(
     "1-chat",
-    "POST /1/chat",
+    "Engage in chat with various AI models on Subnet 1",
     {
-      model: z.string().default("llama-3"),
+      model: z.enum(["llama-3", "llama-3-1-8b", "llama-3-2-3b", "llama-3-1-70b", "mixtral-8x7b", "deepseek-r1-qwen-32b", "Qwen/QwQ-32B", "qwen-2-5-7b"]).default("llama-3").describe("Model used for the chat"),
       messages: z.array(z.object({ 
                 role: z.enum(["user", "assistant", "system"]), 
                 content: z.string() 
@@ -88,111 +88,25 @@ export function registerGeneratedRoutes(server: McpServer) {
     }
   );
 
-  // Register 4-completions endpoint
+  // Register 18-predict endpoint
   server.tool(
-    "4-completions",
-    "POST /4/completions",
+    "18-predict",
+    "Predict temperature for a specific location and time range",
     {
-      model: z.enum(["deepseek-ai/DeepSeek-R1", "deepseek-ai/DeepSeek-V3"]).default("deepseek-ai/DeepSeek-R1").describe("The model to use for completion."),
-      prompt: z.string().default("").describe("Text to generate completion for."),
-      temperature: z.number().default(0.7).describe("Controls randomness in the response. Lower is more deterministic."),
-      max_tokens: z.number().default(256).describe("Maximum number of tokens to generate."),
-      top_p: z.number().default(0.1).describe("Controls diversity via nucleus sampling."),
-      frequency_penalty: z.number().default(0).describe("Reduces repetition of token sequences."),
-      presence_penalty: z.number().default(0).describe("Reduces repetition of topics."),
-      stream: z.boolean().default(true).describe("Whether to stream the response."),
-      logprobs: z.boolean().default(false).describe("Whether to return log probabilities of the output tokens.")
+      lat: z.number().describe("Latitude coordinate"),
+      lon: z.number().describe("Longitude coordinate"),
+      start_timestamp: z.number().describe("Start timestamp in Unix format"),
+      end_timestamp: z.number().describe("End timestamp in Unix format")
     },
     async (params) => {
       try {
-        const response = await api.subnet_4_completions(params);
+        const response = await api.subnet_18_predict(params);
         
         // Check if response contains image data
         if (response && typeof response === 'object' && response.image_b64) {
           // Determine the appropriate MIME type based on the endpoint
           let mimeType = "image/png"; // Default
-          const operationId = "4-completions";
-          if (operationId.includes("text-to-image")) {
-            mimeType = "image/png";
-          } else if (operationId.includes("image-to-image")) {
-            mimeType = "image/jpeg";
-          } else if (operationId.includes("avatar")) {
-            mimeType = "image/png";
-          }
-          
-          // Create a proper resource URI following the MCP specification
-          const resourceUri = `bittensor://${operationId}/image`;
-          
-          const result = {
-            content: [
-              {
-                type: "resource" as const,
-                resource: {
-                  uri: resourceUri,
-                  mimeType: mimeType,
-                  blob: response.image_b64
-                }
-              }
-            ]
-          };
-          
-          return result;
-        }
-        
-        // Default text response handling
-        return {
-          content: [
-            {
-              type: "text",
-              text: typeof response === "string" 
-                ? response 
-                : (response && typeof response === "object" 
-                  ? JSON.stringify(response, null, 2) 
-                  : String(response)),
-            },
-          ],
-        };
-      } catch (error: any) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error?.message || "Unknown error occurred"}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-    }
-  );
-
-  // Register 4-chat endpoint
-  server.tool(
-    "4-chat",
-    "POST /4/chat",
-    {
-      model: z.enum(["deepseek-ai/DeepSeek-R1", "deepseek-ai/DeepSeek-V3"]).default("deepseek-ai/DeepSeek-R1").describe("The model to use for chat completion."),
-      messages: z.array(z.object({ 
-                role: z.enum(["user", "assistant", "system"]), 
-                content: z.string() 
-              })),
-      temperature: z.number().default(0.7).describe("Controls randomness in the response. Lower is more deterministic."),
-      max_tokens: z.number().default(256).describe("Maximum number of tokens to generate."),
-      top_p: z.number().default(0.1).describe("Controls diversity via nucleus sampling."),
-      frequency_penalty: z.number().default(0).describe("Reduces repetition of token sequences."),
-      presence_penalty: z.number().default(0).describe("Reduces repetition of topics."),
-      stream: z.boolean().default(true).describe("Whether to stream the response."),
-      logprobs: z.boolean().default(false).describe("Whether to return log probabilities of the output tokens.")
-    },
-    async (params) => {
-      try {
-        const response = await api.subnet_4_chat(params);
-        
-        // Check if response contains image data
-        if (response && typeof response === 'object' && response.image_b64) {
-          // Determine the appropriate MIME type based on the endpoint
-          let mimeType = "image/png"; // Default
-          const operationId = "4-chat";
+          const operationId = "18-predict";
           if (operationId.includes("text-to-image")) {
             mimeType = "image/png";
           } else if (operationId.includes("image-to-image")) {
@@ -250,7 +164,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 19-chat-completions endpoint
   server.tool(
     "19-chat-completions",
-    "POST /19/chat/completions",
+    "Chat with various AI models on Subnet 19",
     {
       messages: z.array(z.object({ 
                 role: z.enum(["user", "assistant", "system"]), 
@@ -258,7 +172,7 @@ export function registerGeneratedRoutes(server: McpServer) {
               })),
       temperature: z.number().default(0.5).describe("Temperature for text generation"),
       max_tokens: z.number().default(500).describe("Max tokens for text generation"),
-      model: z.string().default(""),
+      model: z.enum(["unsloth/Llama-3.2-3B-Instruct", "Qwen/Qwen2.5-7B-Instruct", "casperhansen/deepseek-r1-distill-qwen-32b-awq", "TheBloke/Rogue-Rose-103b-v0.2-AWQ", "Qwen/QwQ-32B"]).default("unsloth/Llama-3.2-3B-Instruct"),
       top_p: z.number().default(0.5).describe("Top P for text generation"),
       stream: z.boolean().default(false).describe("Stream for text generation")
     },
@@ -328,12 +242,12 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 19-completions endpoint
   server.tool(
     "19-completions",
-    "POST /19/completions",
+    "Generate text completions using AI models from Subnet 19",
     {
       prompt: z.string().default(""),
       temperature: z.number().default(0.5).describe("Temperature for text generation"),
       max_tokens: z.number().default(50).describe("Max tokens for text generation"),
-      model: z.string().default(""),
+      model: z.enum(["unsloth/Llama-3.2-3B-Instruct", "Qwen/Qwen2.5-7B-Instruct", "casperhansen/deepseek-r1-distill-qwen-32b-awq", "TheBloke/Rogue-Rose-103b-v0.2-AWQ", "Qwen/QwQ-32B"]).default("unsloth/Llama-3.2-3B-Instruct"),
       top_p: z.number().default(0.5).describe("Top P for text generation"),
       stream: z.boolean().default(false).describe("Stream for text generation")
     },
@@ -403,7 +317,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 19-text-to-image endpoint
   server.tool(
     "19-text-to-image",
-    "POST /19/text-to-image",
+    "Generate an image from a text description using Subnet 19 models",
     {
       prompt: z.string().default("").describe("Prompt for image generation"),
       negative_prompt: z.string().default("").describe("Negative prompt for image generation"),
@@ -411,7 +325,7 @@ export function registerGeneratedRoutes(server: McpServer) {
       cfg_scale: z.number().default(3).describe("Guidance scale"),
       width: z.number().default(1024).describe("Width for image generation"),
       height: z.number().default(1024).describe("Height for image generation"),
-      model: z.string().default("")
+      model: z.enum(["dataautogpt3/ProteusV0.4-Lightning", "black-forest-labs/FLUX.1-schnell", "Lykon/dreamshaper-xl-lightning"]).default("dataautogpt3/ProteusV0.4-Lightning")
     },
     async (params) => {
       try {
@@ -479,7 +393,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 19-image-to-image endpoint
   server.tool(
     "19-image-to-image",
-    "POST /19/image-to-image",
+    "Modify an existing image based on a text prompt using Subnet 19",
     {
       init_image: z.string().default("").describe("URL for image"),
       prompt: z.string().default(""),
@@ -488,7 +402,7 @@ export function registerGeneratedRoutes(server: McpServer) {
       cfg_scale: z.number().default(3).describe("Guidance scale"),
       width: z.number().default(1024).describe("Width for image generation"),
       height: z.number().default(1024).describe("Height for image generation"),
-      model: z.string().default(""),
+      model: z.enum(["dataautogpt3/ProteusV0.4-Lightning", "black-forest-labs/FLUX.1-schnell", "Lykon/dreamshaper-xl-lightning"]).default("dataautogpt3/ProteusV0.4-Lightning"),
       image_strength: z.number().default(0.5).describe("Image strength of the generated image with respect to the original image")
     },
     async (params) => {
@@ -557,7 +471,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 19-avatar endpoint
   server.tool(
     "19-avatar",
-    "POST /19/avatar",
+    "Generate a stylized avatar from an initial image using Subnet 19",
     {
       prompt: z.string().default("").describe("Prompt for avatar generation"),
       negative_prompt: z.string().default("").describe("Negative prompt for avatar generation"),
@@ -635,13 +549,13 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 20-chat endpoint
   server.tool(
     "20-chat",
-    "POST /20/chat",
+    "Perform tasks using AI agent with tool integration (Subnet 20)",
     {
       messages: z.array(z.object({ 
                 role: z.enum(["user", "assistant", "system"]), 
                 content: z.string() 
               })).describe("Chat message history"),
-      tools: z.array(z.object({ name: z.string(), description: z.string(), arguments: z.object({  }) })).describe("List of tools available for the model to use")
+      tools: z.array(z.object({ name: z.string().optional().describe("Tool name"), description: z.string().optional().describe("Tool functionality description"), arguments: z.object({  }).optional().describe("Tool arguments schema") })).describe("List of tools available for the model to use")
     },
     async (params) => {
       try {
@@ -709,10 +623,10 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 22-search endpoint
   server.tool(
     "22-search",
-    "POST /22/search",
+    "Perform AI-powered search across multiple sources (Subnet 22)",
     {
       prompt: z.string().default("").describe("Search query text to run tools with"),
-      tools: z.array(z.string()).describe("List of search tools to use for fetching data"),
+      tools: z.array(z.enum(["web", "hackernews", "reddit", "wikipedia", "youtube", "twitter", "arxiv"])).describe("List of search tools to use for fetching data"),
       model: z.enum(["NOVA", "ORBIT", "HORIZON"]).default("NOVA").describe("Model to use for scraping"),
       date_filter: z.enum(["PAST_24_HOURS", "PAST_2_DAYS", "PAST_WEEK", "PAST_2_WEEKS", "PAST_MONTH", "PAST_2_MONTHS", "PAST_YEAR", "PAST_2_YEARS"]).default("PAST_WEEK").describe("Time range filter for results"),
       streaming: z.boolean().default(true).describe("Whether to stream results"),
@@ -785,10 +699,10 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 22-search-links-web endpoint
   server.tool(
     "22-search-links-web",
-    "POST /22/search/links/web",
+    "Search web sources (excluding Twitter) for links (Subnet 22)",
     {
       prompt: z.string().default("").describe("Search query prompt"),
-      tools: z.array(z.string()).describe("List of tools to search with"),
+      tools: z.array(z.enum(["web", "hackernews", "reddit", "wikipedia", "youtube", "arxiv"])).describe("List of tools to search with"),
       model: z.enum(["NOVA", "ORBIT", "HORIZON"]).default("NOVA").describe("Model to use for scraping")
     },
     async (params) => {
@@ -857,7 +771,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 22-search-links-twitter endpoint
   server.tool(
     "22-search-links-twitter",
-    "POST /22/search/links/twitter",
+    "Search Twitter for links related to a query (Subnet 22)",
     {
       prompt: z.string().default("").describe("Search query prompt"),
       model: z.enum(["NOVA", "ORBIT", "HORIZON"]).default("NOVA").describe("Model to use for scraping")
@@ -925,10 +839,390 @@ export function registerGeneratedRoutes(server: McpServer) {
     }
   );
 
+  // Register 22-twitter endpoint
+  server.tool(
+    "22-twitter",
+    "Search Twitter for tweets matching a query (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-urls endpoint
+  server.tool(
+    "22-twitter-urls",
+    "Fetch details for specific Twitter tweet URLs (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_urls(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-post endpoint
+  server.tool(
+    "22-twitter-post",
+    "Fetch details for a single Twitter tweet by ID (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_post(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-user-posts endpoint
+  server.tool(
+    "22-twitter-user-posts",
+    "Fetch tweets posted by a specific Twitter user (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_user_posts(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-user-latest endpoint
+  server.tool(
+    "22-twitter-user-latest",
+    "Fetch the latest tweets posted by a specific Twitter user (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_user_latest(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-user-replies endpoint
+  server.tool(
+    "22-twitter-user-replies",
+    "Fetch replies made by a specific Twitter user (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_user_replies(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-post-replies endpoint
+  server.tool(
+    "22-twitter-post-replies",
+    "Fetch replies to a specific Twitter tweet (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_post_replies(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-post-retweets endpoint
+  server.tool(
+    "22-twitter-post-retweets",
+    "Fetch retweets of a specific Twitter tweet (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_post_retweets(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-twitter-user endpoint
+  server.tool(
+    "22-twitter-user",
+    "Fetch profile information for a specific Twitter user (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_twitter_user(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 22-web endpoint
+  server.tool(
+    "22-web",
+    "Perform a standard web search (Subnet 22)",
+    {
+      // No parameters required
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_22_web(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
   // Register 32-detect-text endpoint
   server.tool(
     "32-detect-text",
-    "POST /32/detect-text",
+    "Detect AI-generated text using Subnet 32",
     {
       text: z.string().default("").describe("The text to be analyzed for AI-generated content."),
       deep_scan: z.boolean().default(false)
@@ -999,7 +1293,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 34-detect-image endpoint
   server.tool(
     "34-detect-image",
-    "POST /34/detect-image",
+    "Detect AI-generated images using Subnet 34",
     {
       image: z.string().default("").describe("URL or Base64 encoded image. - For URLs: The image must be publicly accessible. - For Base64: The max size is 4MB. Supported MIME types: image/gif, image/jpeg, image/png, image/bmp, image/tiff.\n")
     },
@@ -1069,7 +1363,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 34-detect-video endpoint
   server.tool(
     "34-detect-video",
-    "POST /34/detect-video",
+    "Detect AI-generated videos using Subnet 34",
     {
 
     },
@@ -1136,10 +1430,157 @@ export function registerGeneratedRoutes(server: McpServer) {
     }
   );
 
+  // Register 42-search endpoint
+  server.tool(
+    "42-search",
+    "Initiate an asynchronous Twitter search job (Subnet 42)",
+    {
+      type: z.enum(["twitter-scraper", "twitter-api-scraper", "twitter-credential-scraper"]).default("twitter-scraper").describe("Data source type. 'twitter-scraper' uses API or credentials, 'twitter-api-scraper' uses API only, 'twitter-credential-scraper' uses credentials only."),
+      arguments: z.object({ type: z.enum(["searchbyquery", "searchbyfullarchive"]).default("searchbyquery").describe("Search method: 'searchbyquery' for live tweets, 'searchbyfullarchive' for historical tweets."), query: z.string().default("").describe("Twitter search query. Supports advanced operators like 'from:user', 'since:YYYY-MM-DD'"), max_results: z.number().default(100).optional().describe("Maximum number of tweets to return (up to 100 for live, 500 for archive)") }).describe("Arguments specific to the search type.")
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_42_search(params);
+        
+        // Check if response contains image data
+        if (response && typeof response === 'object' && response.image_b64) {
+          // Determine the appropriate MIME type based on the endpoint
+          let mimeType = "image/png"; // Default
+          const operationId = "42-search";
+          if (operationId.includes("text-to-image")) {
+            mimeType = "image/png";
+          } else if (operationId.includes("image-to-image")) {
+            mimeType = "image/jpeg";
+          } else if (operationId.includes("avatar")) {
+            mimeType = "image/png";
+          }
+          
+          // Create a proper resource URI following the MCP specification
+          const resourceUri = `bittensor://${operationId}/image`;
+          
+          const result = {
+            content: [
+              {
+                type: "resource" as const,
+                resource: {
+                  uri: resourceUri,
+                  mimeType: mimeType,
+                  blob: response.image_b64
+                }
+              }
+            ]
+          };
+          
+          return result;
+        }
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 42-status-{jobUUID} endpoint
+  server.tool(
+    "42-status-by_jobUUID",
+    "Check the status of a Twitter search job (Subnet 42)",
+    {
+      jobUUID: z.string().describe("UUID of the search job")
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_42_status_by_jobUUID(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // Register 42-result-{jobUUID} endpoint
+  server.tool(
+    "42-result-by_jobUUID",
+    "Get the results of a completed Twitter search job (Subnet 42)",
+    {
+      jobUUID: z.string().describe("UUID of the search job")
+    },
+    async (params) => {
+      try {
+        const response = await api.subnet_42_result_by_jobUUID(params);
+        
+        // Default text response handling
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof response === "string" 
+                ? response 
+                : (response && typeof response === "object" 
+                  ? JSON.stringify(response, null, 2) 
+                  : String(response)),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${error?.message || "Unknown error occurred"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
   // Register 47-compress-text endpoint
   server.tool(
     "47-compress-text",
-    "POST /47/compress/text",
+    "Compress a block of text using Subnet 47",
     {
       text: z.string().default("In machine learning, the perceptron is an algorithm for supervised learning of binary classifiers. A binary classifier is a function which can decide whether or not an input, represented by a vector of numbers, belongs to some specific class. It is a type of linear classifier, i.e. a classification algorithm that makes its predictions based on a linear predictor function combining a set of weights with the feature vector.").describe("Text to be compressed"),
       top_node_performance: z.number().default(0.1).describe("Performance parameter for compression")
@@ -1210,7 +1651,7 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 47-compress-messages endpoint
   server.tool(
     "47-compress-messages",
-    "POST /47/compress/messages",
+    "Compress a conversation history (list of messages) using Subnet 47",
     {
       messages: z.array(z.object({ 
                 role: z.enum(["user", "assistant", "system"]), 
@@ -1286,9 +1727,9 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 64-chat-completions endpoint
   server.tool(
     "64-chat-completions",
-    "POST /64/chat/completions",
+    "Chat with high-performance AI models via Subnet 64",
     {
-      model: z.enum(["deepseek-ai/DeepSeek-V3-0324", "chutesai/Mistral-Small-3.1-24B-Instruct-2503", "deepseek-ai/DeepSeek-R1", "chutesai/Llama-4-Maverick-17B-128E-Instruct-FP8", "deepseek-ai/DeepSeek-V3", "Qwen/Qwen2.5-VL-32B-Instruct", "deepseek-ai/DeepSeek-R1-Zero", "nvidia/Llama-3_1-Nemotron-Ultra-253B-v1", "chutesai/Llama-4-Scout-17B-16E-Instruct", "deepseek-ai/DeepSeek-V3-Base", "moonshotai/Kimi-VL-A3B-Thinking", "nvidia/Llama-3_3-Nemotron-Super-49B-v1", "unsloth/gemma-3-12b-it", "unsloth/gemma-3-1b-it", "unsloth/gemma-3-4b-it", "cognitivecomputations/Dolphin3.0-Mistral-24B", "nvidia/Llama-3.1-Nemotron-Nano-8B-v1", "NousResearch/DeepHermes-3-Llama-3-8B-Preview", "cognitivecomputations/Dolphin3.0-R1-Mistral-24B", "RekaAI/reka-flash-3", "open-r1/OlympicCoder-32B", "open-r1/OlympicCoder-7B"]).default("deepseek-ai/DeepSeek-V3-0324").describe("The model to use for chat completion."),
+      model: z.enum(["deepseek-ai/DeepSeek-V3-0324", "chutesai/Mistral-Small-3.1-24B-Instruct-2503", "deepseek-ai/DeepSeek-R1", "chutesai/Llama-4-Maverick-17B-128E-Instruct-FP8", "deepseek-ai/DeepSeek-V3", "Qwen/Qwen2.5-VL-32B-Instruct", "deepseek-ai/DeepSeek-R1-Zero", "nvidia/Llama-3_1-Nemotron-Ultra-253B-v1", "chutesai/Llama-4-Scout-17B-16E-Instruct", "deepseek-ai/DeepSeek-V3-Base", "moonshotai/Kimi-VL-A3B-Thinking", "cognitivecomputations/Dolphin3.0-Mistral-24B", "cognitivecomputations/Dolphin3.0-R1-Mistral-24B", "microsoft/MAI-DS-R1-FP8", "THUDM/GLM-4-32B-0414", "agentica-org/DeepCoder-14B-Preview", "shisa-ai/shisa-v2-llama3.3-70b", "THUDM/GLM-Z1-32B-0414", "ArliAI/QwQ-32B-ArliAI-RpR-v1", "chutesai/Llama-3.1-405B-FP8"]).default("deepseek-ai/DeepSeek-V3-0324").describe("The model to use for chat completion."),
       messages: z.array(z.object({ 
                 role: z.enum(["user", "assistant", "system"]), 
                 content: z.string() 
@@ -1367,9 +1808,9 @@ export function registerGeneratedRoutes(server: McpServer) {
   // Register 64-completions endpoint
   server.tool(
     "64-completions",
-    "POST /64/completions",
+    "Generate text completions using high-performance models (Subnet 64)",
     {
-      model: z.enum(["deepseek-ai/DeepSeek-V3-0324", "chutesai/Mistral-Small-3.1-24B-Instruct-2503", "deepseek-ai/DeepSeek-R1", "chutesai/Llama-4-Maverick-17B-128E-Instruct-FP8", "deepseek-ai/DeepSeek-V3", "Qwen/Qwen2.5-VL-32B-Instruct", "deepseek-ai/DeepSeek-R1-Zero", "nvidia/Llama-3_1-Nemotron-Ultra-253B-v1", "chutesai/Llama-4-Scout-17B-16E-Instruct", "deepseek-ai/DeepSeek-V3-Base", "moonshotai/Kimi-VL-A3B-Thinking", "nvidia/Llama-3_3-Nemotron-Super-49B-v1", "unsloth/gemma-3-12b-it", "unsloth/gemma-3-1b-it", "unsloth/gemma-3-4b-it", "cognitivecomputations/Dolphin3.0-Mistral-24B", "nvidia/Llama-3.1-Nemotron-Nano-8B-v1", "NousResearch/DeepHermes-3-Llama-3-8B-Preview", "cognitivecomputations/Dolphin3.0-R1-Mistral-24B", "RekaAI/reka-flash-3", "open-r1/OlympicCoder-32B", "open-r1/OlympicCoder-7B"]).default("deepseek-ai/DeepSeek-V3-0324").describe("The model to use for completion."),
+      model: z.enum(["deepseek-ai/DeepSeek-V3-0324", "chutesai/Mistral-Small-3.1-24B-Instruct-2503", "deepseek-ai/DeepSeek-R1", "chutesai/Llama-4-Maverick-17B-128E-Instruct-FP8", "deepseek-ai/DeepSeek-V3", "Qwen/Qwen2.5-VL-32B-Instruct", "deepseek-ai/DeepSeek-R1-Zero", "nvidia/Llama-3_1-Nemotron-Ultra-253B-v1", "chutesai/Llama-4-Scout-17B-16E-Instruct", "deepseek-ai/DeepSeek-V3-Base", "moonshotai/Kimi-VL-A3B-Thinking", "cognitivecomputations/Dolphin3.0-Mistral-24B", "cognitivecomputations/Dolphin3.0-R1-Mistral-24B", "microsoft/MAI-DS-R1-FP8", "THUDM/GLM-4-32B-0414", "agentica-org/DeepCoder-14B-Preview", "shisa-ai/shisa-v2-llama3.3-70b", "THUDM/GLM-Z1-32B-0414", "ArliAI/QwQ-32B-ArliAI-RpR-v1", "chutesai/Llama-3.1-405B-FP8"]).default("deepseek-ai/DeepSeek-V3-0324").describe("The model to use for completion."),
       prompt: z.string().default("").describe("Text to generate completion for."),
       temperature: z.number().default(0.7).describe("Controls randomness in the response. Lower is more deterministic."),
       max_tokens: z.number().default(1024).describe("Maximum number of tokens to generate."),
