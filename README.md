@@ -24,7 +24,7 @@ To use this MCP server with Claude or other MCP clients, add it to your configur
   "mcpServers": {
     "bittensor": {
       "command": "npx",
-      "args": ["-y", "@bitmind/bittensor-mcp@1.0.2"],
+      "args": ["-y", "@bitmind/bittensor-mcp"],
       "env": {
         "BITMIND_API_TOKEN": "<YOUR_API_TOKEN>"
       }
