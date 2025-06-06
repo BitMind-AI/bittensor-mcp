@@ -1,8 +1,5 @@
 # Dependencies
 node_modules
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 
 # Build outputs
 build
@@ -10,7 +7,7 @@ dist
 out
 
 # Generated files
-src/generated/
+src/generated
 
 # Environment variables
 .env
