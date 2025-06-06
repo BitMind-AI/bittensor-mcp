@@ -12,7 +12,7 @@
     "init-submodule": "git submodule init && git submodule update",
     "generate-openapi": "cd subnet-io-registry/docs && python generate_openapi.py",
     "generate-api": "node scripts/generate-api.js",
-    "prepare": "npm run init-submodule && npm run build",
+    "prepare": "npm run init-submodule && npm run generate-api && npm run build",
     "prepublishOnly": "npm run generate-openapi && npm run generate-api && npm run build",
     "version": "git add -A",
     "postversion": "git push && git push --tags"
