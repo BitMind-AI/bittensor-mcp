@@ -98,6 +98,22 @@ function shouldBeNumeric(key, value) {
   )
 }
 
+// Helper function to generate consistent names
+function generateConsistentName(path, pathParams = []) {
+  const pathParts = path.split('/')
+  const subnetId = pathParts[1]
+  const endpointName = pathParts
+    .slice(2)
+    .join('_')
+    .replace(/[\/-]/g, '_')
+    .replace(/\{([^}]+)\}/g, '')
+
+  if (pathParams.length > 0) {
+    return `subnet_${subnetId}__${endpointName}by_${pathParams.map((p) => p.name).join('_and_')}`
+  }
+  return `subnet_${subnetId}__${endpointName}`
+}
+
 // Generate API client content
 const generateApiClientContent = (paths) => {
   const apiFunctions = []
@@ -107,7 +123,7 @@ const generateApiClientContent = (paths) => {
     // Handle POST methods
     const postMethod = methods.post
     if (postMethod) {
-      const operationId = `subnet_${path.replace(/[\/-]/g, '_').slice(1)}`
+      const operationId = generateConsistentName(path)
       const responseSchema =
         postMethod.responses['200']?.content?.['application/json']?.schema
 
@@ -131,7 +147,9 @@ export async function ${operationId}(params: any): Promise<any> {
     // Handle GET methods
     const getMethod = methods.get
     if (getMethod) {
-      const operationId = `subnet_${path.replace(/[\/-]/g, '_').slice(1)}`
+      const pathParams =
+        getMethod.parameters?.filter((param) => param.in === 'path') || []
+      const operationId = generateConsistentName(path, pathParams)
       const responseSchema =
         getMethod.responses['200']?.content?.['application/json']?.schema
 
@@ -140,37 +158,22 @@ export async function ${operationId}(params: any): Promise<any> {
         responseTypes.add(responseType)
       }
 
-      // Check if the path has parameters
-      const pathParams =
-        getMethod.parameters?.filter((param) => param.in === 'path') || []
-
       // Always use the original path, not the external path
       const requestPath = path
 
       if (pathParams.length > 0) {
-        // Create a more readable operationId for paths with parameters
-        const pathParts = path.split('/')
-        const subnetId = pathParts[1]
-        // Remove the path parameter placeholders from the endpoint name
-        const endpointName = pathParts
-          .slice(2)
-          .join('_')
-          .replace(/[\/-]/g, '_')
-          .replace(/\{([^}]+)\}/g, '')
-        const sanitizedOperationId = `subnet_${subnetId}_${endpointName}by_${pathParams.map((p) => p.name).join('_and_')}`
-
         // Create a typed interface for the parameters
         const paramsInterface = pathParams
           .map((param) => `  ${param.name}: string;`)
           .join('\n')
 
         apiFunctions.push(`
-// Interface for ${sanitizedOperationId} parameters
-interface ${sanitizedOperationId.charAt(0).toUpperCase() + sanitizedOperationId.slice(1)}Params {
+// Interface for ${operationId} parameters
+interface ${operationId.charAt(0).toUpperCase() + operationId.slice(1)}Params {
 ${paramsInterface}
 }
 
-export async function ${sanitizedOperationId}(params: ${sanitizedOperationId.charAt(0).toUpperCase() + sanitizedOperationId.slice(1)}Params): Promise<any> {
+export async function ${operationId}(params: ${operationId.charAt(0).toUpperCase() + operationId.slice(1)}Params): Promise<any> {
   // Replace path parameters with actual values
   let url = \`${requestPath}\`;
   for (const [key, value] of Object.entries(params)) {
@@ -230,8 +233,7 @@ const generateRoutesContent = (paths) => {
     // Handle POST methods
     const postMethod = methods.post
     if (postMethod) {
-      const operationId =
-        postMethod.operationId || path.replace(/\//g, '-').slice(1)
+      const operationId = generateConsistentName(path)
       const summary = postMethod.summary || ''
       const parameters =
         postMethod.requestBody?.content?.['application/json']?.schema
@@ -277,16 +279,14 @@ const generateRoutesContent = (paths) => {
       routes.push(`
   // Register ${operationId} endpoint
   server.tool(
-    "${operationId.replace(/\{([^}]+)\}/g, 'by_$1')}",
+    "${operationId}",
     "${summary}",
     {
 ${zodSchema}
     },
     async (params) => {
       try {
-        const response = await api.subnet_${path
-          .replace(/[\/-]/g, '_')
-          .slice(1)}(params);
+        const response = await api.${operationId}(params);
         
         // Check if response contains image data
         if (response && typeof response === 'object' && response.image_b64) {
@@ -351,13 +351,10 @@ ${zodSchema}
     // Handle GET methods
     const getMethod = methods.get
     if (getMethod) {
-      const operationId =
-        getMethod.operationId || path.replace(/\//g, '-').slice(1)
-      const summary = getMethod.summary || ''
-
-      // Check if the path has parameters
       const pathParams =
         getMethod.parameters?.filter((param) => param.in === 'path') || []
+      const operationId = generateConsistentName(path, pathParams)
+      const summary = getMethod.summary || ''
 
       // Generate Zod schema for path parameters
       const zodSchema = pathParams
@@ -379,58 +376,7 @@ ${zodSchema}
         .join(',\n')
 
       // Generate route registration for GET endpoints
-      if (pathParams.length > 0) {
-        // Create a more readable operationId for paths with parameters
-        const pathParts = path.split('/')
-        const subnetId = pathParts[1]
-        // Remove the path parameter placeholders from the endpoint name
-        const endpointName = pathParts
-          .slice(2)
-          .join('_')
-          .replace(/[\/-]/g, '_')
-          .replace(/\{([^}]+)\}/g, '')
-        const sanitizedOperationId = `subnet_${subnetId}_${endpointName}by_${pathParams.map((p) => p.name).join('_and_')}`
-
-        routes.push(`
-  // Register ${operationId} endpoint
-  server.tool(
-    "${operationId.replace(/\{([^}]+)\}/g, 'by_$1')}",
-    "${summary}",
-    {
-${zodSchema || '      // No parameters required'}
-    },
-    async (params) => {
-      try {
-        const response = await api.${sanitizedOperationId}(params);
-        
-        // Default text response handling
-        return {
-          content: [
-            {
-              type: "text",
-              text: typeof response === "string" 
-                ? response 
-                : (response && typeof response === "object" 
-                  ? JSON.stringify(response, null, 2) 
-                  : String(response)),
-            },
-          ],
-        };
-      } catch (error: any) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: \`Error: \${error?.message || "Unknown error occurred"}\`,
-            },
-          ],
-          isError: true,
-        };
-      }
-    }
-  );`)
-      } else {
-        routes.push(`
+      routes.push(`
   // Register ${operationId} endpoint
   server.tool(
     "${operationId}",
@@ -440,9 +386,7 @@ ${zodSchema || '      // No parameters required'}
     },
     async (params) => {
       try {
-        const response = await api.subnet_${path
-          .replace(/[\/-]/g, '_')
-          .slice(1)}(params);
+        const response = await api.${operationId}(params);
         
         // Default text response handling
         return {
@@ -470,7 +414,6 @@ ${zodSchema || '      // No parameters required'}
       }
     }
   );`)
-      }
     }
   }
 

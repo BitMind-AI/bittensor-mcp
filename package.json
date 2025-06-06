@@ -1,6 +1,6 @@
 {
   "name": "@bitmind/bittensor-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Model Context Protocol (MCP) server for Bittensor API",
   "main": "build/index.js",
   "type": "module",
